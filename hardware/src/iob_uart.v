@@ -134,10 +134,10 @@ module iob_uart
       rdata = 0;
       if(ready & ~wstrb_reg)
         case (address_reg)
-          `UART_WRITE_WAIT: rdata = {{DATA_W{1'b0}}, tx_wait | ~cts_int[1]};
-          `UART_DIV       : rdata = bit_duration;
-          `UART_DATA      : rdata = recv_buf_data;
-          `UART_READ_VALID: rdata = {{DATA_W{1'b0}},recv_buf_valid};
+          `UART_WRITE_WAIT: rdata = {{(DATA_W-1 ){1'b0}}, tx_wait | ~cts_int[1]};
+          `UART_DIV       : rdata = {{(DATA_W-16){1'b0}}, bit_duration};
+          `UART_DATA      : rdata = {{(DATA_W-8 ){1'b0}}, recv_buf_data};
+          `UART_READ_VALID: rdata = {{(DATA_W-1 ){1'b0}}, recv_buf_valid};
           default         : rdata = 0;
         endcase
    end
@@ -208,7 +208,7 @@ module iob_uart
          
       end else begin
 
-         recv_counter <= recv_counter + 1;
+         recv_counter <= recv_counter + 1'b1;
          if (data_read_en)
             recv_buf_valid <= 1'b0;
 
